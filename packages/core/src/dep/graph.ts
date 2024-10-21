@@ -1,7 +1,7 @@
 import {
   compose,
-  limitDepth,
   MODULE_INFO_TYPE,
+  reduceKey,
   toInfinity,
 } from "@dep-spy/utils";
 import { Config, Node } from "../type";
@@ -109,13 +109,32 @@ export class Graph {
     await this.ensureGraph();
     const { graph, circularDependency, codependency } = this.config.output;
     if (graph) {
-      this.writeJson(await this.getGraph(), graph);
+      this.writeJson(
+        JSON.stringify(await this.getGraph(), compose([toInfinity])),
+        graph,
+      );
     }
     if (circularDependency) {
-      this.writeJson(await this.getCircularDependency(), circularDependency);
+      this.writeJson(
+        JSON.stringify(
+          await this.getCircularDependency(),
+          compose([toInfinity, reduceKey], {
+            internalKeys: ["name", "version", "path", "circlePath"],
+          }),
+        ),
+        circularDependency,
+      );
     }
     if (codependency) {
-      this.writeJson(await this.getCodependency(), codependency);
+      this.writeJson(
+        JSON.stringify(
+          await this.getCodependency(),
+          compose([toInfinity, reduceKey], {
+            internalKeys: ["name", "version", "path"],
+          }),
+        ),
+        codependency,
+      );
     }
   }
   //确保树已经被生成(开启root的构造)
@@ -137,17 +156,10 @@ export class Graph {
     }
   }
   //序列化
-  private writeJson(
-    result: Node[] | Node | Record<string, Node[]>,
-    outDir: string,
-  ) {
-    fs.writeFileSync(
-      path.join(process.cwd(), outDir),
-      JSON.stringify(result, compose([toInfinity])),
-      {
-        flag: "w",
-      },
-    );
+  private writeJson(result: string, outDir: string) {
+    fs.writeFileSync(path.join(process.cwd(), outDir), result, {
+      flag: "w",
+    });
   }
   //根据新的深度来更新树（调用dfs）
   public async update(newDepth: number): Promise<void> {
