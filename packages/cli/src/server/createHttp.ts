@@ -155,7 +155,13 @@ export function createHttp(app: Express, graph: Graph) {
         return JSON.stringify(
           node,
           compose([toInfinity, reduceKey], {
-            internalKeys: ["name", "version", "path", "circlePath"],
+            internalKeys: [
+              "name",
+              "declarationVersion",
+              "version",
+              "path",
+              "circlePath",
+            ],
           }),
         );
       });
@@ -176,7 +182,7 @@ export function createHttp(app: Express, graph: Graph) {
         return JSON.stringify(
           item,
           compose([toInfinity, reduceKey], {
-            internalKeys: ["name", "version", "path"],
+            internalKeys: ["name", "declarationVersion", "version", "path"],
           }),
         );
       });
