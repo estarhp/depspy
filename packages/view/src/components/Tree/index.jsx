@@ -111,14 +111,7 @@ function Tree({ width = window.innerWidth }, svg) {
         dep.highlight = true;
         return dep;
       });
-      useStore.subscribe(
-        (state) => state.selectedCodependency,
-        () => {
-          preHighlight.current.forEach((node) => {
-            node.highlight = false;
-          });
-        },
-      );
+      
       preHighlight.current = selectedNodes;
 
       setSelectNode(selectedNodes[0]);
@@ -140,6 +133,14 @@ function Tree({ width = window.innerWidth }, svg) {
       throttle(() => {
         setData((pre) => [...pre]);
       }, 500),
+    );
+    useStore.subscribe(
+      (state) => state.selectedCodependency,
+      () => {
+        preHighlight.current.forEach((node) => {
+          node.highlight = false;
+        });
+      },
     );
   }, []);
   return (

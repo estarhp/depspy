@@ -1,26 +1,31 @@
 import { StaticNode } from "@dep-spy/core";
 import { useStaticStore, useStore } from "./index";
 import { searchNodePath } from "./searchNode";
-import { getDependency, getNode, updateDepth } from "./api";
+import { getDependency, getNode, getNodeByPath, updateDepth } from "./api";
 export const EventType = {
   init: "init",
   depth: "depth",
 };
 
 export async function getNodeByPaths(curRoot: any, paths: string[]) {
-  curRoot.dependencies
-  for (const path of paths) {
-    if (!curRoot.dependencies || !curRoot.dependencies[path]) {
-      const res = await getNode({
-        id: curRoot.name + curRoot.declarationVersion,
-        depth: 2,
-        path: curRoot.path,
+  let isFetched = false;
+  for (const path of paths.slice(1)) {
+
+    console.log(curRoot, curRoot.dependencies, path);
+    
+    if (curRoot && (!curRoot.dependencies || !curRoot.dependencies[path]) && !isFetched) {
+      
+      const res = await getNodeByPath({
+        name: path,
+        path: paths,
       });
-
-      curRoot.dependencies = res.data.dependencies;
+      console.log(res.data, curRoot);
+      
+      curRoot = res.data || {};
+      isFetched = true;
     }
-
-    curRoot = curRoot.dependencies[path];
+    curRoot = (curRoot && curRoot.dependencies)? curRoot.dependencies[path]: {};
+    
   }
 }
 
@@ -41,7 +46,7 @@ export const EventBus = {
         if (
           collapse &&
           newNode.name + newNode.declarationVersion !==
-            root.name + root.declarationVersion
+          root.name + root.declarationVersion
         ) {
           const res = await getNode({
             id: newNode.name + newNode.declarationVersion,
@@ -65,10 +70,10 @@ export const EventBus = {
         depth: 3,
       });
       const depRes = await getDependency()
-      const {codependency, circularDependency} = depRes.data;
-      
+      const { codependency, circularDependency } = depRes.data;
+
       const root = res.data;
-     
+
 
       useStore.setState({ rootLoading: false });
       //连接初始化回调

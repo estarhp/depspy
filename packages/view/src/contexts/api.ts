@@ -22,7 +22,6 @@ export const getNode = async (query: {
   treeLeaves.forEach((node) => {
     treeMap.set(node.path.join('/'), node)
   })
-  console.log(treeMap);
 
   const treeRoot = treeLeaves[0]
   genarateTree(treeRoot, treeMap)
@@ -77,12 +76,25 @@ function stringifyObjToParams(obj: any) {
     .join("&");
 }
 
-export const getNodeByPath = async (query: { path: string[] }) => {
+export const getNodeByPath = async (query: { name: string,path: string[] }) => {
   const res = await fetch(`${baseUrl}/getNodeByPath?${stringifyObjToParams(query)}`);
   const reader = await res.arrayBuffer();
   const treeLeaves = parseNodeBuffer(reader)
-  console.log(treeLeaves);
-  return treeLeaves
+  console.log(treeLeaves, query.name,query.path);
+  
+  const treeMap = new Map()
+  treeLeaves.forEach((node) => {
+    treeMap.set(node.path.join('/'), node)
+  })
+
+  const treeRoot = treeLeaves[0]
+  
+  genarateTree(treeRoot, treeMap)
+  console.log(treeRoot);
+  
+  return {
+    data: treeRoot
+  }
 
 }
 
