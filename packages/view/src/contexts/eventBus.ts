@@ -1,13 +1,14 @@
 import { StaticNode } from "@dep-spy/core";
 import { useStaticStore, useStore } from "./index";
 import { searchNodePath } from "./searchNode";
-import { getNode, updateDepth } from "./api";
+import { getDependency, getNode, updateDepth } from "./api";
 export const EventType = {
   init: "init",
   depth: "depth",
 };
 
 export async function getNodeByPaths(curRoot: any, paths: string[]) {
+  curRoot.dependencies
   for (const path of paths) {
     if (!curRoot.dependencies || !curRoot.dependencies[path]) {
       const res = await getNode({
@@ -63,22 +64,11 @@ export const EventBus = {
       const res = await getNode({
         depth: 3,
       });
-
-      const { root, circularDependency, codependency } = res.data;
-      let paths: string[];
-      const curRoot: any = root;
-      // // 加载循环依赖节点
-      // for (const selectedCircularDependency of circularDependency) {
-      //   paths = selectedCircularDependency.circlePath.slice(1);
-      //   await getNodeByPaths(curRoot, paths);
-      // }
-      // 加载相同依赖节点
-      // for (const selectedCodependency of Object.values(codependency)) {
-      //   for (const coNode of selectedCodependency as any[]) {
-      //     paths = coNode.path.slice(1);
-      //     await getNodeByPaths(curRoot, paths);
-      //   }
-      // }
+      const depRes = await getDependency()
+      const {codependency, circularDependency} = depRes.data;
+      
+      const root = res.data;
+     
 
       useStore.setState({ rootLoading: false });
       //连接初始化回调

@@ -202,8 +202,7 @@ function Tree({ width = window.innerWidth }, svg) {
             if (highlight) {
               d3.select(svg.current).attr(
                 "viewBox",
-                `${y + width / 2 - innerWidth / 2}, ${
-                  x - innerHeight / 2
+                `${y + width / 2 - innerWidth / 2}, ${x - innerHeight / 2
                 }, ${innerWidth}, ${innerHeight}`,
               );
             }
@@ -393,7 +392,11 @@ function findDepBypath(paths, data) {
  */
 function filterData(data, collapse) {
   let depth = 1;
+
   function traverse(data) {
+    if (!data) {
+      return {}
+    }
     const newData = {
       ...data,
       originDeps: { ...data.dependencies },
