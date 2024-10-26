@@ -8,21 +8,18 @@ export const EventType = {
 };
 
 export async function getNodeByPaths(curRoot: any, paths: string[]) {
-  let isFetched = false;
   for (const path of paths.slice(1)) {
 
-    console.log(curRoot, curRoot.dependencies, path);
-    
-    if (curRoot && (!curRoot.dependencies || !curRoot.dependencies[path]) && !isFetched) {
+    if (curRoot && (!curRoot.dependencies || !curRoot.dependencies[path])) {
       
       const res = await getNodeByPath({
         name: path,
         path: paths,
       });
-      console.log(res.data, curRoot);
+      console.log(curRoot, res.data);
       
       curRoot = res.data || {};
-      isFetched = true;
+      break;
     }
     curRoot = (curRoot && curRoot.dependencies)? curRoot.dependencies[path]: {};
     
@@ -43,6 +40,7 @@ export const EventBus = {
       (state) => state.selectedNode,
       async (newNode) => {
         const { collapse, root } = useStore.getState();
+        
         if (
           collapse &&
           newNode.name + newNode.declarationVersion !==
@@ -73,6 +71,8 @@ export const EventBus = {
       const { codependency, circularDependency } = depRes.data;
 
       const root = res.data;
+      console.log('全局初始数据', root);
+      
 
 
       useStore.setState({ rootLoading: false });

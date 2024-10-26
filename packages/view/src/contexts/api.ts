@@ -53,6 +53,8 @@ export const getDependency = async () => {
   const cirDeps = parseNodeBuffer(reader)
   const reader2 = await res2.arrayBuffer();
   const codeps = parseNodeBuffer(reader2)
+  console.log(cirDeps.length);
+  
   const result = {
     data: {
       codependency: {},
@@ -103,14 +105,17 @@ function genarateTree(node: Node, treeMap: Map<string, Node>) {
   if (!node) return;
   const deplists = Object.keys(node.dependenciesList || {});
   deplists.forEach(key => {
-
-    node.dependencies[key] = treeMap.get([...node.path, key].join('/')) ? treeMap.get([...node.path, key].join('/')) : {};
-
+    if(treeMap.get([...node.path, key].join('/'))) {
+      node.dependencies[key] = treeMap.get([...node.path, key].join('/'))
+    }
     genarateTree(node.dependencies[key], treeMap);
   })
 }
 
 function parseNodeBuffer(buffer) {
+  if(!buffer) {
+    throw new Error('buffer is empty')
+  }
   const nodes = [];
   let offset = 0;
 

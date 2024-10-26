@@ -396,9 +396,6 @@ export class Graph {
     //首个pathName 可以省略
     path.slice(1).reduce((node: Node, pathName: string) => {
       const nextNode = node.dependencies?.[pathName];
-      if (!nextNode) {
-        return node;
-      }
 
       //遇到起点
       if (pathName.includes(name)) {
@@ -406,6 +403,10 @@ export class Graph {
       }
 
       ifTarget && results.push(nextNode);
+
+      if (!nextNode) {
+        return node;
+      }
 
       return nextNode;
     }, this.graph);
