@@ -397,22 +397,16 @@ export class Graph {
   }
 
   public getNodeByPath(name: string, path: string[]) {
-    let ifTarget = !name;
-    const results: Node[] = ifTarget ? [this.graph] : [];
-
+    const results: Node[] = [];
+    let ifTarget = false;
     //首个pathName 可以省略
     path.slice(1).reduce((node: Node, pathName: string) => {
-      const nextNode = node.dependencies?.[pathName];
-
-      //遇到起点
-      if (pathName.includes(name)) {
-        ifTarget = true;
-      }
-
+      const nextNode = node.dependencies[pathName];
       ifTarget && results.push(nextNode);
 
-      if (!nextNode) {
-        return node;
+      //遇到起点
+      if (name === pathName) {
+        ifTarget = true;
       }
 
       return nextNode;
